@@ -59,10 +59,8 @@ const App = () => {
           element={
             token ? (
               <Navigate to="/dashboard" />
-            ) : hasTempUser ? (
-              <JoinGroup />
             ) : (
-              <Navigate to="/" />
+              <JoinGroup />
             )
           }
         />
