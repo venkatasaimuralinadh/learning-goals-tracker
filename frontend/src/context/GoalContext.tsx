@@ -3,6 +3,7 @@ import type { Goal } from "../types/GoalModel";
 import type { ReactNode } from "react";
 import axios from "axios";
 import { useUser } from "./AppContext";
+import API_BASE_URL from "../config/config";
 
 export interface GoalContextType {
   goals: Goal[];
@@ -25,7 +26,7 @@ export const GoalProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const fetchGoals = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/goals/user/getAll", {
+        const response = await axios.get(API_BASE_URL+"/goals/user/getAll", {
           headers: {
             Authorization: token,
           },
@@ -44,7 +45,7 @@ export const GoalProvider = ({ children }: { children: ReactNode }) => {
   const addGoal = async (goal: Omit<Goal, "id">) => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/goals/add",
+        API_BASE_URL+"/goals/add",
         {
           title: goal.title,
           progress: goal.progress,
@@ -64,7 +65,7 @@ export const GoalProvider = ({ children }: { children: ReactNode }) => {
 
   const deleteGoal = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:5000/api/goals/delete/${id}`, {
+      await axios.delete(API_BASE_URL+"/goals/delete/${id}", {
         headers: {
           Authorization: token,
         },

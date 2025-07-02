@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "../context/AppContext";
+import API_BASE_URL from "../config/config";
 
 const JoinGroup = () => {
   const { setToken, setGroup, setUsername } = useUser();
@@ -12,14 +13,25 @@ const JoinGroup = () => {
 
   const navigate = useNavigate();
 
-
-  const name = localStorage.getItem("temp_username") || "";
-  const password = localStorage.getItem("temp_password") || "";
+  const [name, setName] = useState<string | null>(null);
+  const [password, setPassword] = useState<string | null>(null);
 
   useEffect(() => {
+    const storedName = localStorage.getItem("temp_username");
+    const storedPassword = localStorage.getItem("temp_password");
+
+    if (storedName && storedPassword) {
+      setName(storedName);
+      setPassword(storedPassword);
+    } else {
+      setError("Missing credentials. Please login again.");
+      navigate("/login");
+    }
+
+  
     const fetchGroups = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/groups/getAll");
+        const response = await axios.get(API_BASE_URL + "/groups/getAll");
         setGroups(response.data);
       } catch (err) {
         setError("Failed to fetch groups");
@@ -29,7 +41,7 @@ const JoinGroup = () => {
     };
 
     fetchGroups();
-  }, []);
+  }, [navigate]);
 
   const handleJoin = async (group_name: string) => {
     if (!name || !password) {
@@ -38,8 +50,9 @@ const JoinGroup = () => {
 
     setJoining(true);
     setError(null);
+
     try {
-      const response = await axios.post("http://localhost:5000/api/register", {
+      const response = await axios.post(API_BASE_URL + "/register", {
         username: name,
         password,
         group_name,

@@ -6,9 +6,22 @@ import Navbar from "./components/Navbar";
 import { useUser } from "./context/AppContext";
 import { GoalProvider } from './context/GoalContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import { useEffect, useState } from 'react';
 
 const App = () => {
   const { token, loading } = useUser();
+  const [hasTempUser, setHasTempUser] = useState<boolean>(false);
+
+  useEffect(() => {
+    const tempUsername = localStorage.getItem("temp_username");
+    const tempPassword = localStorage.getItem("temp_password");
+
+    if (tempUsername && tempPassword) {
+      setHasTempUser(true);
+    } else {
+      setHasTempUser(false);
+    }
+  }, []);
 
   if (loading) {
     return (
@@ -20,17 +33,17 @@ const App = () => {
     );
   }
 
-  const hasTempUser = localStorage.getItem("temp_username") && localStorage.getItem("temp_password");
-  console.log(hasTempUser);
-
   return (
     <GoalProvider>
       {token && <Navbar />}
       <Routes>
-        <Route path="/" element={token ? (
-              <Navigate to="/dashboard" />
-            ) : <Login />} />
+        {/* Main route: Redirect to dashboard if logged in */}
+        <Route
+          path="/"
+          element={token ? <Navigate to="/dashboard" /> : <Login />}
+        />
 
+        {/* Protected Dashboard route */}
         <Route
           path="/dashboard"
           element={
@@ -40,6 +53,7 @@ const App = () => {
           }
         />
 
+        {/* Join Group route */}
         <Route
           path="/groups"
           element={
@@ -53,6 +67,7 @@ const App = () => {
           }
         />
 
+        {/* Fallback route */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </GoalProvider>
